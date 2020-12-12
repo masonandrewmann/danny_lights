@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <EEPROM.h>
 //#include <Adafruit_BMP280.h>
 #include <ESP8266HTTPClient.h>
 
@@ -17,13 +18,12 @@
 
 #define LEDPIN D2
 
-float   t = 0 ;
-float   h = 0 ;
-float   p = 0;
-String  LEDstate = "OFF";
+//EEPROM addresses
+int addr_universeNum = 0;
+int addr_dmxAdr = 5;
 
-int universeNum = 0;
-int dmxAdr = 0;
+int universeNum;
+int dmxAdr;
 
 //create Objects
 //Adafruit_BMP280 bmp; // I2C
@@ -49,6 +49,21 @@ String getPage(){
   return page;
 }
 
+void writeIntIntoEEPROM(int address, int number)
+{ 
+  EEPROM.write(address, (number >> 24) & 0xFF);
+  EEPROM.write(address + 1, (number >> 16) & 0xFF);
+  EEPROM.write(address + 2, (number >> 8) & 0xFF);
+  EEPROM.write(address + 3, number & 0xFF);
+}
+int readIntFromEEPROM(int address)
+{
+  return ((int)EEPROM.read(address) << 24) +
+         ((int)EEPROM.read(address + 1) << 16) +
+         ((int)EEPROM.read(address + 2) << 8) +
+         (int)EEPROM.read(address + 3);
+}
+
 void handleRoot(){
   if ( server.hasArg("LED") ) {
     Serial.println("LED");
@@ -56,14 +71,24 @@ void handleRoot(){
     server.send ( 200, "text/html", getPage() );
   } 
  } 
+ 
 void handleSubmit(){
 
   Serial.println ("handleSubmit");
+  //fetch DMX configuration
     String universeNumStr = server.arg(0);
     String dmxAdrStr = server.arg(1);
-
+  //convert DMX configuration to ints
     universeNum = universeNumStr.toInt();
     dmxAdr = dmxAdrStr.toInt();
+  //annnnd write it into EEPROM
+    writeIntIntoEEPROM(addr_universeNum, universeNum);
+    writeIntIntoEEPROM(addr_dmxAdr, dmxAdr);
+        if (EEPROM.commit()) {
+      Serial.println("EEPROM successfully committed");
+    } else {
+      Serial.println("ERROR! EEPROM commit failed");
+    }
    
   String
   message = "URI: ";
@@ -86,14 +111,21 @@ void handleSubmit(){
 
 void setup() {
   Serial.begin ( 115200 );
-  // Init BMP280
-//  if ( !bmp.begin() ) {
-//    Serial.println("BMP280 KO!");
-//    while(1);
-//  } else {
-//    Serial.println("BMP280 OK");
-//  }
- 
+  Serial.println("Setup begin");
+    EEPROM.begin(512);
+  //initialize DMX configuration into EEPROM: COMMENT OUT WHEN YOU ARE DONE TESTING!!!!!!!!!!!!
+//  writeIntIntoEEPROM(addr_universeNum, 10);
+//  writeIntIntoEEPROM(addr_dmxAdr, 11);
+//      if (EEPROM.commit()) {
+//      Serial.println("EEPROM successfully committed");
+//    } else {
+//      Serial.println("ERROR! EEPROM commit failed");
+//    }
+  
+  //read eeprom to set global DMX configuration variables
+  universeNum = readIntFromEEPROM(addr_universeNum);
+  dmxAdr = readIntFromEEPROM(addr_dmxAdr);
+  
   WiFi.begin ( ssid, password );
   // Waiting for connection
   while ( WiFi.status() != WL_CONNECTED ) {
