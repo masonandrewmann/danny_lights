@@ -15,3 +15,4 @@ IOTWebConf.h
 
 ESP8266HTTPClient.h
 
+for IR remote code: use the IRremote library here: https://github.com/NicoHood/IRLremote
