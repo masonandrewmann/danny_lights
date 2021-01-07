@@ -19,17 +19,17 @@
 
 #define LEDPIN 16
 #define BUTTONPIN 13 // (D7)
+#define IOTWEBCONF_CONFIG_START 8
 
 //EEPROM addresses
 int addr_universeNum = 0;
-int addr_dmxAdr = 5;
+int addr_dmxAdr = 4;
 
 int universeNum;
 int dmxAdr;
 
 //
 boolean programMode = false;
-int beepTimer = 1000;
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "AutoconnectAP";
@@ -185,10 +185,6 @@ void setup() {
 
 void loop() {
     iotWebConf.doLoop();  
-    if (millis()> beepTimer){
-      Serial.println("beep");
-      beepTimer = millis() + 1000;
-    }
 }
 
 /**
