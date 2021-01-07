@@ -17,6 +17,7 @@
 #define BMP_CS 10
 
 #define LEDPIN D2
+#define BUTTONPIN 15
 
 //EEPROM addresses
 int addr_universeNum = 0;
@@ -24,6 +25,9 @@ int addr_dmxAdr = 5;
 
 int universeNum;
 int dmxAdr;
+
+//
+boolean programMode = false;
 
 //create Objects
 //Adafruit_BMP280 bmp; // I2C
@@ -109,10 +113,23 @@ void handleSubmit(){
   server.send ( 200, "text/html", getPage() );
 }
 
+ICACHE_RAM_ATTR void buttonPressed(){
+  programMode = !programMode;
+  Serial.println("Mode button pressed!");
+  if (programMode){
+    Serial.println("Address input mode");
+  } else {
+    Serial.println("Operating mode");
+  }
+  Serial.println(" ");
+}
+
 void setup() {
   Serial.begin ( 115200 );
   Serial.println("Setup begin");
-    EEPROM.begin(512);
+  EEPROM.begin(512);
+  
+  attachInterrupt(digitalPinToInterrupt(BUTTONPIN), buttonPressed, RISING);
   //initialize DMX configuration into EEPROM: COMMENT OUT WHEN YOU ARE DONE TESTING!!!!!!!!!!!!
 //  writeIntIntoEEPROM(addr_universeNum, 10);
 //  writeIntIntoEEPROM(addr_dmxAdr, 11);
@@ -121,6 +138,7 @@ void setup() {
 //    } else {
 //      Serial.println("ERROR! EEPROM commit failed");
 //    }
+
   
   //read eeprom to set global DMX configuration variables
   universeNum = readIntFromEEPROM(addr_universeNum);
@@ -147,7 +165,5 @@ void setup() {
 
 void loop() {
   server.handleClient();
-//  t = bmp.readTemperature();
-//  p = bmp.readPressure() / 100.0F;
   delay(1000);
 }
