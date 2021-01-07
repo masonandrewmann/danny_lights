@@ -1,16 +1,9 @@
-//test
-//https://diyprojects.io/esp8266-web-server-tutorial-create-html-interface-connected-object/#.Wyk7dop9jDd
-
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
 #include <IotWebConf.h>
-//#include <Adafruit_BMP280.h>
 #include <ESP8266HTTPClient.h>
-
-#define ssid      "ed-law"       // WiFi SSID
-#define password  "EDLAWREAB1"        // WiFi password
 
 #define BMP_SCK 13                 
 #define BMP_MISO 12
@@ -116,16 +109,17 @@ void handleSubmit(){
   server.send ( 200, "text/html", getPage() );
 }
 
-ICACHE_RAM_ATTR void buttonPressed(){
-  programMode = !programMode;
-  Serial.println("Mode button pressed!");
-  if (programMode){
-    Serial.println("Address input mode");
-  } else {
-    Serial.println("Operating mode");
-  }
-  Serial.println(" ");
-}
+//button pressed callback
+//ICACHE_RAM_ATTR void buttonPressed(){
+//  programMode = !programMode;
+//  Serial.println("Mode button pressed!");
+//  if (programMode){
+//    Serial.println("Address input mode");
+//  } else {
+//    Serial.println("Operating mode");
+//  }
+//  Serial.println(" ");
+//}
 
 void setup() {
   Serial.begin ( 115200 );
