@@ -5,6 +5,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
+#include <IotWebConf.h>
 //#include <Adafruit_BMP280.h>
 #include <ESP8266HTTPClient.h>
 
@@ -16,8 +17,8 @@
 #define BMP_MOSI 11
 #define BMP_CS 10
 
-#define LEDPIN D2
-#define BUTTONPIN 15
+#define LEDPIN 16
+#define BUTTONPIN 13 // (D7)
 
 //EEPROM addresses
 int addr_universeNum = 0;
@@ -28,29 +29,43 @@ int dmxAdr;
 
 //
 boolean programMode = false;
+int beepTimer = 1000;
+
+// -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
+const char thingName[] = "AutoconnectAP";
+
+// -- Initial password to connect to the Thing, when it creates an own Access Point.
+const char wifiInitialApPassword[] = "password";
+
+DNSServer dnsServer;
+WebServer server(80);
+
+IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword);
+
 
 //create Objects
 //Adafruit_BMP280 bmp; // I2C
-ESP8266WebServer server ( 80 );
+//ESP8266WebServer server ( 80 );
 
 String getPage(){
-  //String page = "<html lang=fr-FR><head><meta http-equiv='refresh' content='10'/>";
-  String page = "<html lang=fr-FR><head>";
-  page += "<title>Light Bar</title>";
-  page += "<style> body { background-color: #fffff; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }</style>";
-  page += "</head><body><h1>DMX Configuration</h1>";
-  page += "<h3>Universe</h3>";
-  page += "<form action='/submit' method='POST'>";
-  page += "<ul><li><input type='number' name='Uni' id='Uni' value='" + String(universeNum) + "' min='0' max='24'>";
-  page += "</li></ul>";
-  page += "<br>";
-  page += "<h3>Address</h3>";
-  page += "<form action='submit' method='POST'>";
-  page += "<ul><li><input type='number' name='Adr' id = 'Adr' value ='" + String(dmxAdr) + "' min='0' max='24'>";
-  page += "<br><br><br>";
-  page += "<input type = 'submit' value='Submit'></li></ul>";
-  page += "</body></html>";
-  return page;
+  String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
+  s += "<title>IotWebConf 01 Minimal</title></head><body>hiiii i am a light fixture,, welcome to my brain!<br>";
+  s += "Go <a href='config'>here</a> to change network settings.";
+  s += "<title>Light Bar</title>";
+  s += "<style> body { background-color: #fffff; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }</style>";
+  s += "</head><body><h1>DMX Configuration</h1>";
+  s += "<h3>Universe</h3>";
+  s += "<form action='/submit' method='POST'>";
+  s += "<ul><li><input type='number' name='Uni' id='Uni' value='" + String(universeNum) + "' min='0' max='24'>";
+  s += "</li></ul>";
+  s += "<br>";
+  s += "<h3>Address</h3>";
+  s += "<form action='submit' method='POST'>";
+  s += "<ul><li><input type='number' name='Adr' id = 'Adr' value ='" + String(dmxAdr) + "' min='0' max='24'>";
+  s += "<br><br><br>";
+  s += "<input type = 'submit' value='Submit'></li></ul>";
+  s += "</body></html>\n";
+  return s;
 }
 
 void writeIntIntoEEPROM(int address, int number)
@@ -68,13 +83,13 @@ int readIntFromEEPROM(int address)
          (int)EEPROM.read(address + 3);
 }
 
-void handleRoot(){
-  if ( server.hasArg("LED") ) {
-    Serial.println("LED");
-  } else {
-    server.send ( 200, "text/html", getPage() );
-  } 
- } 
+//void handleRoot(){
+//  if ( server.hasArg("LED") ) {
+//    Serial.println("LED");
+//  } else {
+//    server.send ( 200, "text/html", getPage() );
+//  } 
+// } 
  
 void handleSubmit(){
 
@@ -129,7 +144,7 @@ void setup() {
   Serial.println("Setup begin");
   EEPROM.begin(512);
   
-  attachInterrupt(digitalPinToInterrupt(BUTTONPIN), buttonPressed, RISING);
+//  attachInterrupt(digitalPinToInterrupt(BUTTONPIN), buttonPressed, CHANGE);
   //initialize DMX configuration into EEPROM: COMMENT OUT WHEN YOU ARE DONE TESTING!!!!!!!!!!!!
 //  writeIntIntoEEPROM(addr_universeNum, 10);
 //  writeIntIntoEEPROM(addr_dmxAdr, 11);
@@ -143,27 +158,50 @@ void setup() {
   //read eeprom to set global DMX configuration variables
   universeNum = readIntFromEEPROM(addr_universeNum);
   dmxAdr = readIntFromEEPROM(addr_dmxAdr);
-  
-  WiFi.begin ( ssid, password );
-  // Waiting for connection
-  while ( WiFi.status() != WL_CONNECTED ) {
-    delay ( 500 ); Serial.print ( "." );
+
+  // ACCESS POINT CONFIG
+    // -- Initializing the configuration.
+    pinMode(BUTTONPIN, INPUT);
+  if (digitalRead(BUTTONPIN) == 0){
+    Serial.println("Skipping Access Point Setup Mode");
+    iotWebConf.skipApStartup();
+  } else {
+    Serial.println("Entering Access Point Setup Mode");
   }
-  //WiFi connection is OK
-  Serial.println ( "" );
-  Serial.print ( "Connected to " ); Serial.println ( ssid );
-  Serial.print ( "IP address: " ); Serial.println ( WiFi.localIP() );
+  iotWebConf.init();
+  iotWebConf.setStatusPin(LEDPIN);
+  pinMode(LEDPIN, OUTPUT);
 
-  // Link to the function that manage launch page
-  server.on ( "/", handleRoot );
+  // -- Set up required URL handlers on the web server.
+  server.on("/", handleRoot);
   server.on ( "/submit", handleSubmit );
+  server.on("/config", []{ iotWebConf.handleConfig(); });
+  server.onNotFound([](){ iotWebConf.handleNotFound(); });
 
-  server.begin();
-  Serial.println ( "HTTP server started" );
+  Serial.println("Ready.");
+
  
 }
 
 void loop() {
-  server.handleClient();
-  delay(1000);
+    iotWebConf.doLoop();  
+    if (millis()> beepTimer){
+      Serial.println("beep");
+      beepTimer = millis() + 1000;
+    }
+}
+
+/**
+ * Handle web requests to "/" path.
+ */
+void handleRoot()
+{
+  // -- Let IotWebConf test and handle captive portal requests.
+  if (iotWebConf.handleCaptivePortal())
+  {
+    // -- Captive portal request were already served.
+    return;
+  }
+  String s = getPage();
+  server.send(200, "text/html", s);
 }

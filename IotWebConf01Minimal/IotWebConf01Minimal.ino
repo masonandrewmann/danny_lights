@@ -83,3 +83,26 @@ void handleRoot()
 
   server.send(200, "text/html", s);
 }
+
+//IotWebConf::IotWebConf(
+//    const char* defaultThingName, DNSServer* dnsServer, WebServer* server,
+//    const char* initialApPassword, const char* configVersion)
+//{
+//  strncpy(this->_thingName, defaultThingName, IOTWEBCONF_WORD_LEN);
+//  this->_dnsServer = dnsServer;
+//  this->_server = server;
+//  this->_initialApPassword = initialApPassword;
+//  this->_configVersion = configVersion;
+//  itoa(this->_apTimeoutMs / 1000, this->_apTimeoutStr, 10);
+//
+//  this->_thingNameParameter = IotWebConfParameter("Thing name beep boop", "iwcThingName", this->_thingName, IOTWEBCONF_WORD_LEN);
+//  this->_apPasswordParameter = IotWebConfParameter("AP password", "iwcApPassword", this->_apPassword, IOTWEBCONF_PASSWORD_LEN, "password");
+//  this->_wifiSsidParameter = IotWebConfParameter("WiFi SSID", "iwcWifiSsid", this->_wifiSsid, IOTWEBCONF_WORD_LEN);
+//  this->_wifiPasswordParameter = IotWebConfParameter("WiFi password", "iwcWifiPassword", this->_wifiPassword, IOTWEBCONF_PASSWORD_LEN, "password");
+//  this->_apTimeoutParameter = IotWebConfParameter("Startup delay (seconds)", "iwcApTimeout", this->_apTimeoutStr, IOTWEBCONF_WORD_LEN, "number", NULL, NULL, "min='1' max='600'", false);
+//  this->addParameter(&this->_thingNameParameter);
+//  this->addParameter(&this->_apPasswordParameter);
+//  this->addParameter(&this->_wifiSsidParameter);
+//  this->addParameter(&this->_wifiPasswordParameter);
+//  this->addParameter(&this->_apTimeoutParameter);
+//}
