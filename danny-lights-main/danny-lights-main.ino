@@ -42,11 +42,6 @@ WebServer server(80);
 
 IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword);
 
-
-//create Objects
-//Adafruit_BMP280 bmp; // I2C
-//ESP8266WebServer server ( 80 );
-
 String getPage(){
   String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
   s += "<title>IotWebConf 01 Minimal</title></head><body>hiiii i am a light fixture,, welcome to my brain!<br>";
@@ -75,6 +70,7 @@ void writeIntIntoEEPROM(int address, int number)
   EEPROM.write(address + 2, (number >> 8) & 0xFF);
   EEPROM.write(address + 3, number & 0xFF);
 }
+
 int readIntFromEEPROM(int address)
 {
   return ((int)EEPROM.read(address) << 24) +
@@ -82,14 +78,6 @@ int readIntFromEEPROM(int address)
          ((int)EEPROM.read(address + 2) << 8) +
          (int)EEPROM.read(address + 3);
 }
-
-//void handleRoot(){
-//  if ( server.hasArg("LED") ) {
-//    Serial.println("LED");
-//  } else {
-//    server.send ( 200, "text/html", getPage() );
-//  } 
-// } 
  
 void handleSubmit(){
 
@@ -145,6 +133,7 @@ void setup() {
   EEPROM.begin(512);
   
 //  attachInterrupt(digitalPinToInterrupt(BUTTONPIN), buttonPressed, CHANGE);
+
   //initialize DMX configuration into EEPROM: COMMENT OUT WHEN YOU ARE DONE TESTING!!!!!!!!!!!!
 //  writeIntIntoEEPROM(addr_universeNum, 10);
 //  writeIntIntoEEPROM(addr_dmxAdr, 11);
