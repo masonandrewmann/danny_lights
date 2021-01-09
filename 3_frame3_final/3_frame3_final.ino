@@ -10,7 +10,7 @@
   This example may be copied under the terms of the MIT license, see the LICENSE file for details
 */
 
-#include <Artnet.h>
+#include <Artnet.h> // https://github.com/natcl/Artnet  
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 #include <SPI.h>
@@ -18,7 +18,7 @@
 
 #include <WiFi101.h>
 #include <WiFiUdp.h>
-#include <Adafruit_SleepyDog.h>
+//#include <Adafruit_SleepyDog.h>
 
 
 // Neopixel settings
@@ -29,10 +29,8 @@ const byte dataPin = 13;
 Adafruit_NeoPixel leds = Adafruit_NeoPixel(numLeds, dataPin, NEO_GRBW + NEO_KHZ800);
 int status = WL_IDLE_STATUS;
 
-char ssid[] = "foaw_frames"; //  your network SSID (name)
-char pass[] = "framesoup";    // your network password (use for WPA, or use as key for WEP)
-//char ssid[] = "B2"; //  your network SSID (name)
-//char pass[] = "77037880108";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "NETGEAR08"; //  your network SSID (name)
+char pass[] = "deepink618";    // your network password (use for WPA, or use as key for WEP)
 long dbm;
 
 
@@ -51,6 +49,7 @@ int previousDataLength = 0;
 byte ip[] = {192, 168, 1, 151};
 //byte mac[] = {0x04, 0xE9, 0xE5, 0x00, 0x69, 0xEC};
 //byte broadcast[] = {10, 0, 1, 255};
+
 void setup()
 {
   powerTest();
@@ -61,7 +60,7 @@ void setup()
   artnet.begin();
   // this will be called for each packet received
   artnet.setArtDmxCallback(onDmxFrame);
-  int countdownMS = Watchdog.enable(10000);
+//  int countdownMS = Watchdog.enable(10000);
 
 }
 
@@ -72,9 +71,9 @@ void loop()
 }
 
 void wifiCheck() {
-  if (WiFi.status() == WL_CONNECTED) {
-    Watchdog.reset();
-  }
+//  if (WiFi.status() == WL_CONNECTED) {
+//    Watchdog.reset();
+//  }
   dbm = WiFi.RSSI();
   Serial.print("signal Strength: ");
   Serial.println(dbm);
