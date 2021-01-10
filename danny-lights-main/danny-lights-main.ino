@@ -51,7 +51,7 @@ IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword);
 const int numLeds = 10; // Tile 3 !
 const int channelsPerLed = 3; // tile1 = RGBW
 const int numberOfChannels = numLeds * channelsPerLed; // Total number of channels you want to receive (1 led = 3 channels)
-const int dataPin = 14;
+const int dataPin = 14; //
 Adafruit_NeoPixel leds = Adafruit_NeoPixel(numLeds, dataPin, NEO_GRB + NEO_KHZ800);
 int status = WL_IDLE_STATUS;
 
@@ -165,6 +165,7 @@ void handleSubmit(){
 void setup() {
   Serial.begin ( 115200 );
   Serial.println("Setup begin");
+  Serial.println(maxUniverses);
   EEPROM.begin(512);
   leds.begin();
   artnet.begin();
@@ -214,6 +215,7 @@ void loop() {
     artnet.read();
 //    leds.fill(leds.Color(0, 100, 200));
 //    leds.show();
+//  Serial.println(maxUniverses);
 }
 
 /**
@@ -233,49 +235,27 @@ void handleRoot()
 
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data)
 {
+  int universeFromEEPROM = readIntFromEEPROM(addr_universeNum);
+  int startAddressFromEEPROM = readIntFromEEPROM(addr_dmxAdr);
   Serial.println("-----FRAME RECIEVED-------");
-  sendFrame = 1;
-  // set brightness of the whole strip 
-  if (universe == 15)
-  {
-    Serial.println("universe 15 engaged");
-    leds.setBrightness(data[0]);
-    leds.show();
-  }
-
-  // Store which universe has got in
-  if ((universe - startUniverse) < maxUniverses)
-    universesReceived[universe - startUniverse] = 1;
-
-  for (int i = 0 ; i < maxUniverses ; i++)
-  {
-    if (universesReceived[i] == 0)
-    {
-      Serial.println("Broke");
-      sendFrame = 0;
-      break;
-    }
-  }
+  Serial.println(universe);
 
   // read universe and put into the right part of the display buffer
-  for (int i = 0; i < length / 3; i++)
-  {
-    int led = i + (universe - startUniverse) * (previousDataLength / 3);
-    if (led < numLeds)
-      leds.setPixelColor(led, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
-//      Serial.println(data[i * 3]);
-//      Serial.println(data[i * 3 + 1]);
-//      Serial.println(data[i * 3 + 2]);
-  }
-  previousDataLength = length;     
-
-  if (sendFrame)
-  {
+  if (universe == universeFromEEPROM){
+    for (int i = 0; i < length / 3; i++)
+    {
+        leds.setPixelColor(
+        i, 
+        data[startAddressFromEEPROM + i * 3 - 1], 
+        data[startAddressFromEEPROM + i * 3], 
+        data[startAddressFromEEPROM + i * 3 + 1]
+        );
+  //      Serial.println(data[i * 3]);
+  //      Serial.println(data[i * 3 + 1]);
+  //      Serial.println(data[i * 3 + 2]);
+    }
+  }   
     leds.show();
-    Serial.println("sending that frame babyyyy");
-    // Reset universeReceived to 0
-    memset(universesReceived, 0, maxUniverses);
-  }
 }
 
 void initTest()

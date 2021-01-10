@@ -114,28 +114,28 @@ void wifiInit2() {
 
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence, uint8_t* data, IPAddress remoteIP)
 {
-  // Serial.println(universe);
+   Serial.println(universe);
   sendFrame = 1;
   // set brightness of the whole strip
-  if (universe == 15)
-  {
-    leds.setBrightness(data[0]);
-    leds.show();
-  }
-
-  // Store which universe has got in
-  if ((universe - startUniverse) < maxUniverses)
-    universesReceived[universe - startUniverse] = 1;
-
-  for (int i = 0 ; i < maxUniverses ; i++)
-  {
-    if (universesReceived[i] == 0)
-    {
-      //Serial.println("Broke");
-      sendFrame = 0;
-      break;
-    }
-  }
+//  if (universe == 15)
+//  {
+//    leds.setBrightness(data[0]);
+//    leds.show();
+//  }
+//
+//  // Store which universe has got in
+//  if ((universe - startUniverse) < maxUniverses)
+//    universesReceived[universe - startUniverse] = 1;
+//
+//  for (int i = 0 ; i < maxUniverses ; i++)
+//  {
+//    if (universesReceived[i] == 0)
+//    {
+//      //Serial.println("Broke");
+//      sendFrame = 0;
+//      break;
+//    }
+//  }
 
   // read universe and put into the right part of the display buffer
   for (int i = 0; i < length / channelsPerLed; i++)
