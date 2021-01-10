@@ -3,20 +3,13 @@ esp8266 for individually addressable LED bars controllable through both IR remot
 
 required libraries:
 
-ESP8266WiFi.h
-
-WiFiClient.h
-
-ESP8266WebServer.h
-
 EEPROM.h
 
-IOTWebConf.h
+IOTWebConf.h // NOTE: This library has been modified so that it stores starting EEPROM at address 8 instead of 0, use the version included in this repository rather than the official release OR change the line "# define IOTWEBCONF_CONFIG_START 0" to "# define IOTWEBCONF_CONFIG_START 8" in IotWebConf.h
 
-ESP8266HTTPClient.h
+ArtnetWifi.h 
 
+Adafruit_NeoPixel.h
 
 
 for IR remote code: use the IRremote library here: https://github.com/NicoHood/IRLremote
-
-https://github.com/natcl/Artnet  
