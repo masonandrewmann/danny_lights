@@ -1,10 +1,10 @@
 //from wifi config code
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <ESP8266WebServer.h>
+//#include <ESP8266WebServer.h>
 #include <EEPROM.h>
 #include <IotWebConf.h>
-#include <ESP8266HTTPClient.h>
+//#include <ESP8266HTTPClient.h>
 
 //from tmz artnet stuff
 #include <ArtnetWifi.h> // https://github.com/natcl/Artnet  
@@ -17,10 +17,6 @@
 //#include <WiFiUdp.h>
 //#include <Adafruit_SleepyDog.h>
 
-//#define BMP_SCK 13                 
-//#define BMP_MISO 12
-//#define BMP_MOSI 11
-//#define BMP_CS 10
 
 #define LEDPIN 16 //D5 on esp8266 dev boad
 #define BUTTONPIN 13 // D7 on esp8266 dev boad
@@ -213,9 +209,6 @@ void setup() {
 void loop() {
     iotWebConf.doLoop();  
     artnet.read();
-//    leds.fill(leds.Color(0, 100, 200));
-//    leds.show();
-//  Serial.println(maxUniverses);
 }
 
 /**
