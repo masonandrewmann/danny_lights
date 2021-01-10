@@ -5,7 +5,7 @@ required libraries:
 
 EEPROM.h
 
-IOTWebConf.h // NOTE: This library has been modified so that it stores starting EEPROM at address 8 instead of 0, use the version included in this repository rather than the official release OR change the line "# define IOTWEBCONF_CONFIG_START 0" to "# define IOTWEBCONF_CONFIG_START 8" in IotWebConf.h
+IOTWebConf.h // NOTE: This library has been modified so that it stores starting EEPROM at address 8 instead of 0, use the version included in this repository rather than the official release OR change the line "# define IOTWEBCONF_CONFIG_START 0" to "# define IOTWEBCONF_CONFIG_START 8" in IotWebConf.h in the official release
 
 ArtnetWifi.h 
 
