@@ -229,7 +229,6 @@ void setup()
 
 
 void loop() {
-//  Serial.println("top of loop");
   currentMillis = millis();
   
   if (!irrecv.decode(&signals)) {

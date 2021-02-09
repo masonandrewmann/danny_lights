@@ -27,7 +27,7 @@
 
 // -- We might want to place the config in the EEPROM in an offset.
 #ifndef IOTWEBCONF_CONFIG_START
-# define IOTWEBCONF_CONFIG_START 8
+# define IOTWEBCONF_CONFIG_START 19
 #endif
 
 // -- Maximal length of any string used in IotWebConfig configuration (e.g.
