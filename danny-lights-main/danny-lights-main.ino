@@ -92,6 +92,8 @@ uint8_t brightnessFactor = 20 ; // how many steps to from full bright to black o
 uint8_t brightnessInterval = BRIGHTNESS / brightnessFactor ; /// BRIGHTNESS (overall brighntess// max brigtness) divided by btightness factor creates the interval you step by
 uint8_t brightness = BRIGHTNESS; // this is new brightness ( BRIGHTNESS - the brightness factor)
 uint8_t bands;
+boolean initialized = false;
+
 #define SOLIDCOLOR 1
 #define GRADIENT 2
 #define RANDOMBANDS 3
@@ -246,23 +248,26 @@ void setup() {
   FastLED.setBrightness(BRIGHTNESS);
   FastLED.clear();  // clear all pixel data
   FastLED.show();
-  EEPROM.get(0, effect); // get that effect number
-  Serial.print("EEPROM loading-- ");
-  Serial.println(effect);
-  if (effect == SOLIDCOLOR) {
-    EEPROM.get(1, color);
-    solidColor(color);
-  }
-  if (effect == GRADIENT) {
-    EEPROM.get(4, color1);
-    EEPROM.get(7, color2);
-    fill_gradient(leds, 0, color1, NUM_LEDS, color2, SHORTEST_HUES);
-    FastLED.show();
-  }
-  if (effect == RANDOMBANDS) {
-    EEPROM.get(10, bands);
-    randomBands(bands);
-  }
+
+//  startFromEEPROM()
+//  EEPROM.get(0, effect); // get that effect number
+//  Serial.print("EEPROM loading-- ");
+//  Serial.println(effect);
+//  
+//  if (effect == SOLIDCOLOR) {
+//    EEPROM.get(1, color);
+//    solidColor(color);
+//  }
+//  if (effect == GRADIENT) {
+//    EEPROM.get(4, color1);
+//    EEPROM.get(7, color2);
+//    fill_gradient(leds, 0, color1, NUM_LEDS, color2, SHORTEST_HUES);
+//    FastLED.show();
+//  }
+//  if (effect == RANDOMBANDS) {
+//    EEPROM.get(10, bands);
+//    randomBands(bands);
+//  }
 }
 
 void loop() {
@@ -271,8 +276,15 @@ void loop() {
   // Art-Net Mode
     iotWebConf.doLoop();  
     artnet.read();
-  } else {
-    //IR Remote Mode
+    if (initialized){
+      initialized = false;
+    }
+  } 
+  
+  else {
+    if (!initialized){
+      startFromEEPROM();
+    }
   currentMillis = millis();
   if (!irrecv.decode(&signals)) {
     if (currentMillis - previousMillis > intrvl) {
@@ -898,3 +910,47 @@ void easterEggPole() { // a secret effect if you press FLASH 3 times
     }
   }
 }
+
+void startFromEEPROM(){
+  int effNum = (int)EEPROM.read(0);
+  initialized = true;
+  switch (effNum) {
+    case 1:
+      Serial.println("solid color mode");
+//      color = readIntFromEEPROM(1);
+      EEPROM.get(1, color);
+      solidColor(color);
+    break;
+
+    case 2: 
+       Serial.println("gradient mode");
+       EEPROM.get(4, color1);
+       EEPROM.get(7, color2);
+      fill_gradient(leds, 0, color1, NUM_LEDS, color2, SHORTEST_HUES);
+      FastLED.show();
+    break;
+
+    case RANDOMBANDS:
+    EEPROM.get(10, bands);
+    randomBands(bands);
+    break;
+    
+    default:
+      Serial.println("an animiation probably");
+    break;
+}
+}
+
+//#define SOLIDCOLOR 1
+//#define GRADIENT 2
+//#define RANDOMBANDS 3
+//#define FADE7 4
+//#define FADE3 5
+//#define SINELON 6
+//#define JUGGLE 7
+//#define BARBERPOLE 8
+//#define BRIGHT 9
+//#define DIM 10
+//#define BARBERPOLE1 11
+//#define BARBERPOLE2 12
+//#define EASTEREGGPOLE 13
