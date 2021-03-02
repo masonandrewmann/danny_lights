@@ -392,7 +392,7 @@ void onDmxFrame(uint16_t universe, uint16_t length_, uint8_t sequence, uint8_t* 
 {
   int universeFromEEPROM = readIntFromEEPROM(addr_universeNum);
   int startAddressFromEEPROM = readIntFromEEPROM(addr_dmxAdr);
-  Serial.println("-----FRAME RECIEVED-------");
+//  Serial.println("-----FRAME RECIEVED-------");
 //  Serial.println(universe);
 //  Serial.println(universeFromEEPROM);
 //  Serial.println(startAddressFromEEPROM);
@@ -659,11 +659,13 @@ void staticGradient() {
   Serial.println("in static gradient");
   while (!haveWePickedColors) { //defaults to false
     CHSV color1 = getButtonColorNew();
+//    Serial.println("COLOR 1 FETCHED YAYY");
     for (int i = 0; i < NUM_LEDS; i++) {
       leds[i] = color1;
     }
     FastLED.show();
     Serial.println("color1");
+    IRCommand = 0xFFF00F; // hacky solution because the while loop in getButtonColorNew is weird
     CHSV color2 = getButtonColorNew();
     fill_gradient(leds, 0, color1, NUM_LEDS, color2, SHORTEST_HUES);
     EEPROM.put(4, color1); // address 4,5,6 are first color
@@ -684,7 +686,7 @@ CHSV getButtonColor() { // need to wait until we get a color here
     }
     Serial.print("in get color1: ");
     Serial.println(IRCommand, HEX);
-    colorIndex = 99;
+    IRCommand = 99;
     for (int i = 4; i < 24; i++) {
       Serial.print(i);
       if (IRCommand == commandsArray[i]) {
@@ -704,18 +706,19 @@ CHSV getButtonColor() { // need to wait until we get a color here
 }
 
 CHSV getButtonColorNew(){
+  Serial.println(IRCommand, HEX);
   int colorIndex = 99;
   while (colorIndex == 99) {
-//    IRCommand = getButton();     // if IR signals is received, then do this
-      IRCommand = getButtonNew();
-    while (IRCommand == 0) {
-//      IRCommand = getButton();
-      IRCommand = getButtonNew();
-      //Serial.println("in this color 1 while loop");
+    while (IRCommand == 0xFFF00F) {
+      if (irrecv.decode(&signals)){
+        IRCommand = getButtonNew();
+      }
+      Serial.println("in this color 1 while loop");
+      delay(10);
     }
     Serial.print("in get color1: ");
     Serial.println(IRCommand, HEX);
-    colorIndex = 99;
+//    colorIndex = 99;
     for (int i = 4; i < 24; i++) {
       Serial.print(i);
       if (IRCommand == commandsArray[i]) {
@@ -726,6 +729,7 @@ CHSV getButtonColorNew(){
 
       if (i == 23 && colorIndex == 99) { // check to see if we have a weird non button code so we dont get stuck here
         //getButtonColor();
+        IRCommand = 0xFFF00F;
         Serial.print("button pressed that was not a color. ColorIndex is: ");
         Serial.println(colorIndex);
       }
@@ -767,11 +771,13 @@ uint32_t getButton() {
 }
 
 uint32_t getButtonNew(){
-  if (irrecv.decode(&signals))
+//  irrecv.resume();
+  if (irrecv.decode(&signals)){
       Serial.println("IR signal received");
       IRCommand = signals.value;
-    irrecv.resume(); // get the next signal
+      irrecv.resume(); // get the next signal
       return IRCommand;
+  }
 }
 
 void update_effect() {
