@@ -1,3 +1,10 @@
+/*
+  FastLED + standard 44 Key Ir RGB Led remote + Teensy 3.2
+ MMason Mann 3.2.2021
+  Adapted from Dean Montgomery --- 44-key IR remote customization
+  https://github.com/dmonty2/ir_remote_leds
+*/
+
 //from wifi config code
 #include <EEPROM.h>
 #include "libraries/IotWebConf/src/IotWebConf.h"
@@ -24,6 +31,9 @@
 //4 -- color 1 for gradient
 //7 -- color 2 for gradient
 //10 --- number of bands for randomBands
+//16 DIY1 Color
+//19 DIY2 Color
+//22 DIY3 Color
 //25 -- DMX Universe Number
 //30 -- DMX Starting Address Number
 //35 -- IOT Library Stuff
@@ -76,6 +86,7 @@ CHSV color;
 CHSV color1;
 CHSV color2;
 boolean powerOn = true;
+enum Rgb { RED, GREEN, BLUE };
 
 //other variables setups
 
@@ -185,6 +196,39 @@ CHSV CHSV_array[] = { r1, g1, b1, w1,
                       r5, g5, b5, w5
                     };
 
+                    // storing diy in eeprom
+
+uint8_t r = 0; //red
+uint8_t g = 0; //green
+uint8_t b = 0; //blue
+#define SLIDE_VALUE 110
+#define SLIDE_RGB 111
+uint8_t slide = SLIDE_VALUE;
+uint8_t last_white = 0;
+CHSV water[NUM_LEDS];
+
+struct DIY {
+  uint8_t r; uint8_t g; uint8_t b;
+};
+//Track start points in eeprom index
+static uint16_t eeprom_addr[] = {16, 19, 22};
+
+struct DIY_BUTTON {
+  uint8_t button;
+  bool dirty;
+};
+DIY_BUTTON lastdiy = { 0, false };
+/*
+struct DIYSTORE {
+  DIY diy1; DIY diy2; DIY diy3; // stored at 0,  3,  6
+  DIY diy4; DIY diy5; DIY diy6; // stored at 9, 12, 15
+};
+ size of EEPROM: 1024 bytes
+ size of 44 key remote: 176 bytes
+ size of DIY: 3 bytes
+ size of DIYSTORE: 18 bytes
+ */
+
 void setup() {
   //------------------------SETUP FOR ARTNET MODE------------------------
   Serial.begin ( 115200 );
@@ -289,15 +333,8 @@ void loop() {
   if (!irrecv.decode(&signals)) {
     if (currentMillis - previousMillis > intrvl) {
       previousMillis = currentMillis;
-      if (powerOn){
-        if (effect > 3) {
-          update_effect();
-          FastLED.show();
-        }
-      } else {
-        FastLED.clear();  // clear all pixel data
-        FastLED.show();
-      }
+      update_effect();
+      FastLED.show();
     }
   }
   if (irrecv.decode(&signals)) {
@@ -434,6 +471,12 @@ void mainButton() {
 //    FastLED.show();
 //    effect = 0; //ot to reset the effect counter so we dont go into the  effects loop
 //    Serial.println("power");
+//    startFromEEPROM();
+    if (powerOn){
+      FastLED.setBrightness(brightness);
+    } else {
+      FastLED.setBrightness(0);
+    }
     powerOn = !powerOn;
   }
 
@@ -546,32 +589,17 @@ void mainButton() {
     Serial.println(intrvl);
   }
   if (IRCommand == remote.diy1) {
-    effect = RANDOMBANDS;
-    bands = 1;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("diy1");
+    updateDiy(0);
   }
   if (IRCommand == remote.diy2) {
-    effect = RANDOMBANDS;
-    bands = 2;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-     Serial.println("diy2");
+    updateDiy(1);
   }
   if (IRCommand == remote.diy3) {
-    effect = RANDOMBANDS;
-    bands = 3;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-     Serial.println("diy3");
+    updateDiy(2);
   }
   if (IRCommand == remote.diy4) {
     effect = RANDOMBANDS;
-    bands = 4;
+    bands = 2;
     randomBands(bands);
     EEPROM.put(0, effect);
     EEPROM.put(10, bands);
@@ -579,7 +607,7 @@ void mainButton() {
   }
   if (IRCommand == remote.diy5) {
     effect = RANDOMBANDS;
-    bands = 5;
+    bands = 3;
     randomBands(bands);
     EEPROM.put(0, effect);
     EEPROM.put(10, bands);
@@ -587,59 +615,29 @@ void mainButton() {
   }
   if (IRCommand == remote.diy6) {
     effect = RANDOMBANDS;
-    bands = 6;
+    bands = 4;
     randomBands(bands);
     EEPROM.put(0, effect);
     EEPROM.put(10, bands);
     Serial.println("diy6");
   }
   if (IRCommand == remote.red_up) {
-    effect = RANDOMBANDS;
-    bands = 9;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("red_up");
+    colorUpDown(RED, 10); 
   }
   if (IRCommand == remote.green_up) {
-    effect = RANDOMBANDS;
-    bands = 12;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("green_up");
+    colorUpDown(GREEN, 10); 
   }
   if (IRCommand == remote.blue_up) {
-    effect = RANDOMBANDS;
-    bands = 15;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("blue_up");
+    colorUpDown(BLUE, 10); 
   }
   if (IRCommand == remote.red_down) {
-    effect = RANDOMBANDS;
-    bands = 30;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("red_down");
+    colorUpDown(RED, -10); 
   }
   if (IRCommand == remote.green_down) {
-    effect = RANDOMBANDS;
-    bands = 42;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("green_down");
+    colorUpDown(GREEN, -10); 
   }
   if (IRCommand == remote.blue_down) {
-    effect = RANDOMBANDS;
-    bands = 60;
-    randomBands(bands);
-    EEPROM.put(0, effect);
-    EEPROM.put(10, bands);
-    Serial.println("blue_down");
+    colorUpDown(BLUE, -10); 
   }
   if (IRCommand == remote.flash) {
     intrvl = 0;
@@ -654,6 +652,10 @@ void mainButton() {
     }
     Serial.println("flash");
   }
+  if (IRCommand != remote.red_up && IRCommand != remote.green_up && IRCommand != remote.blue_up &&
+      IRCommand != remote.red_down && IRCommand != remote.green_down && IRCommand != remote.blue_down && lastdiy.dirty){
+        lastdiy.dirty = false;
+      }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -941,16 +943,59 @@ void startFromEEPROM(){
 }
 }
 
-//#define SOLIDCOLOR 1
-//#define GRADIENT 2
-//#define RANDOMBANDS 3
-//#define FADE7 4
-//#define FADE3 5
-//#define SINELON 6
-//#define JUGGLE 7
-//#define BARBERPOLE 8
-//#define BRIGHT 9
-//#define DIM 10
-//#define BARBERPOLE1 11
-//#define BARBERPOLE2 12
-//#define EASTEREGGPOLE 13
+void updateDiy(uint8_t num){
+  effect = 0;
+  //Serial.print("diy ");
+  //Serial.println(num);
+  if ( lastdiy.button == num && lastdiy.dirty == true){
+    Serial.println("storing DIY");
+    Serial.println(r);
+    Serial.println(g);
+    Serial.println(b);
+    // avoid 100,000 write cycle limit by only writing what is needed.
+    EEPROM.write(eeprom_addr[num], r);
+    EEPROM.write(eeprom_addr[num] + 1, g);
+    EEPROM.write(eeprom_addr[num] + 2, b);
+    lastdiy.dirty = false;
+  } else {
+    lastdiy.button = num;
+    lastdiy.dirty = false;
+    DIY diy;
+    EEPROM.get(eeprom_addr[num], diy);
+    // default was 255 so make unset value a dull grey 
+//    if ( diy.r > BRIGHTNESS ) diy.r = BRIGHTNESS/3;
+//    if ( diy.g > BRIGHTNESS ) diy.g = BRIGHTNESS/3;
+//    if ( diy.b > BRIGHTNESS ) diy.b = BRIGHTNESS/3;
+//    r = EEPROM.read(eeprom_addr[num]);
+//    g = EEPROM.read(eeprom_addr[num] + 1);
+//    b = EEPROM.read(eeprom_addr[num] + 2);
+    r = diy.r;
+    g = diy.g;
+    b = diy.b;
+    Serial.println(r);
+    Serial.println(g);
+    Serial.println(b);
+    fill_solid(leds, NUM_LEDS, CRGB( r, g, b ));
+  }
+  slide = SLIDE_RGB;
+  FastLED.show();
+}
+
+void colorUpDown(int color, int8_t val){
+  effect = 0;
+  r = leds[1].r; g = leds[1].g; b = leds[1].b;
+  uint8_t z[] = { r, g, b };
+  if ( z[color] + val >= 1 && z[color] + val <= 250 ){
+    if ( color == RED   ) { r += val; }
+    if ( color == GREEN ) { g += val; }
+    if ( color == BLUE  ) { b += val; }
+    lastdiy.dirty = true;
+    fill_solid(leds, NUM_LEDS, CRGB( r, g, b ));
+  }
+  slide = SLIDE_RGB;
+  FastLED.show();
+  //Serial.print("updown ");
+  //Serial.print(color);
+  //Serial.print(" ");
+  //Serial.println(val);
+}
