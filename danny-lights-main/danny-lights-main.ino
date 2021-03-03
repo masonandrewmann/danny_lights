@@ -31,6 +31,7 @@
 //4 -- color 1 for gradient
 //7 -- color 2 for gradient
 //10 --- number of bands for randomBands
+//13 --- brightness
 //16 DIY1 Color
 //19 DIY2 Color
 //22 DIY3 Color
@@ -293,7 +294,7 @@ void setup() {
   FastLED.clear();  // clear all pixel data
   FastLED.show();
 
-//  startFromEEPROM()
+  startFromEEPROM();
 //  EEPROM.get(0, effect); // get that effect number
 //  Serial.print("EEPROM loading-- ");
 //  Serial.println(effect);
@@ -375,6 +376,7 @@ void writeIntIntoEEPROM(int address, int number)
   EEPROM.write(address + 1, (number >> 16) & 0xFF);
   EEPROM.write(address + 2, (number >> 8) & 0xFF);
   EEPROM.write(address + 3, number & 0xFF);
+  EEPROM.commit();  
 }
 
 int readIntFromEEPROM(int address)
@@ -502,6 +504,7 @@ void mainButton() {
 
     EEPROM.put(0, effect); // Eeprom address 0 is effect/mode
     EEPROM.put(1, color); // eeprom address 1,2,3 are color1
+    EEPROM.commit();  
       Serial.println("solid_colors");
   }
 
@@ -513,6 +516,7 @@ void mainButton() {
     haveWePickedColors = false;
     effect = GRADIENT; // got to reset the effect counter so we dont go into the  effects loop
     EEPROM.put(0, effect);
+    EEPROM.commit();  
       Serial.println("autom");
   }
 
@@ -522,6 +526,7 @@ void mainButton() {
     h = 0; s = 255; v = 0;
     effect = JUGGLE;
     EEPROM.put(0, effect);
+    EEPROM.commit();  
       Serial.println("jump3");
   }
   if (IRCommand == remote.jump7) {
@@ -531,6 +536,7 @@ void mainButton() {
     h = 0; s = 255; v = 0;
     effect = SINELON;
     EEPROM.put(0, effect);
+    EEPROM.commit();  
   }
   if (IRCommand == remote.fade3) {
     Serial.println("fade 3");
@@ -539,12 +545,14 @@ void mainButton() {
     h = 0; s = 255; v = 0;
     effect = FADE3;
     EEPROM.put(0, effect);
+    EEPROM.commit();  
   }
   if (IRCommand == remote.fade7) {
     intrvl = 65;
     effect = FADE7;
     h = 0; s = 255; v = 255;
     EEPROM.put(0, effect);
+    EEPROM.commit();  
       Serial.println("fade 7");
   }
   if (IRCommand == remote.bright) {
@@ -556,6 +564,8 @@ void mainButton() {
     FastLED.show();
     Serial.print("brightness pressed. brightness = ");
     Serial.println(brightness);
+    EEPROM.put(13, brightness);
+    EEPROM.commit();  
   }
 
   if (IRCommand == remote.dim) {
@@ -567,6 +577,8 @@ void mainButton() {
     FastLED.show();
     Serial.print("dimmer pressed. brightness = ");
     Serial.println(brightness);
+    EEPROM.put(13, brightness);
+    EEPROM.commit();  
   }
   if (IRCommand == remote.slow) {
     if (intrvl >= 100) {
@@ -606,6 +618,7 @@ void mainButton() {
     randomBands(bands);
     EEPROM.put(0, effect);
     EEPROM.put(10, bands);
+    EEPROM.commit();  
     Serial.println("diy4");
   }
   if (IRCommand == remote.diy5) {
@@ -614,6 +627,7 @@ void mainButton() {
     randomBands(bands);
     EEPROM.put(0, effect);
     EEPROM.put(10, bands);
+    EEPROM.commit();  
     Serial.println("diy5");
   }
   if (IRCommand == remote.diy6) {
@@ -622,6 +636,7 @@ void mainButton() {
     randomBands(bands);
     EEPROM.put(0, effect);
     EEPROM.put(10, bands);
+    EEPROM.commit();  
     Serial.println("diy6");
   }
   if (IRCommand == remote.red_up) {
@@ -699,6 +714,7 @@ void staticGradient() {
     fill_gradient(leds, 0, color1, NUM_LEDS, color2, SHORTEST_HUES);
     EEPROM.put(4, color1); // address 4,5,6 are first color
     EEPROM.put(7, color2); // address 7,8,9 are second color
+    EEPROM.commit();  
     FastLED.show();
 
     haveWePickedColors = true;
@@ -931,6 +947,13 @@ void easterEggPole() { // a secret effect if you press FLASH 3 times
 void startFromEEPROM(){
   int effNum = (int)EEPROM.read(0);
   initialized = true;
+
+  EEPROM.get(13, brightness);
+  Serial.println(brightness); 
+    FastLED.setBrightness(brightness);
+
+  Serial.println(effNum);
+  
   switch (effNum) {
     case 1:
       Serial.println("solid color mode");
