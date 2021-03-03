@@ -589,12 +589,15 @@ void mainButton() {
     Serial.println(intrvl);
   }
   if (IRCommand == remote.diy1) {
+    Serial.println("diy1");
     updateDiy(0);
   }
   if (IRCommand == remote.diy2) {
+    Serial.println("diy2");
     updateDiy(1);
   }
   if (IRCommand == remote.diy3) {
+    Serial.println("diy3");
     updateDiy(2);
   }
   if (IRCommand == remote.diy4) {
@@ -652,10 +655,22 @@ void mainButton() {
     }
     Serial.println("flash");
   }
-  if (IRCommand != remote.red_up && IRCommand != remote.green_up && IRCommand != remote.blue_up &&
-      IRCommand != remote.red_down && IRCommand != remote.green_down && IRCommand != remote.blue_down && lastdiy.dirty){
+//  if (IRCommand != remote.red_up && IRCommand != remote.green_up && IRCommand != remote.blue_up &&
+//      IRCommand != remote.red_down && IRCommand != remote.green_down && IRCommand != remote.blue_down && lastdiy.dirty){
+//        lastdiy.dirty = false;
+//      }
+
+//check if we need to exit diy loop
+  boolean realButton = false; //check if the ir code corresponds to a button
+    for (int i = 0; i < 44; i++) { //the first 4 buttons are not color buttons, so we dont wanna scan through those in the array
+//      Serial.println("buttonNum: " + i);
+      if (IRCommand == commandsArray[i] && IRCommand != remote.red_up && IRCommand != remote.green_up && IRCommand != remote.blue_up &&
+        IRCommand != remote.red_down && IRCommand != remote.green_down && IRCommand != remote.blue_down && lastdiy.dirty) {
+        Serial.println("exiting diy mode");
         lastdiy.dirty = false;
+        lastdiy.button = 0;
       }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -945,8 +960,9 @@ void startFromEEPROM(){
 
 void updateDiy(uint8_t num){
   effect = 0;
-  //Serial.print("diy ");
-  //Serial.println(num);
+  Serial.print("diy ");
+  Serial.println(num);
+  Serial.println(eeprom_addr[num]);
   if ( lastdiy.button == num && lastdiy.dirty == true){
     Serial.println("storing DIY");
     Serial.println(r);
