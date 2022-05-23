@@ -9,6 +9,7 @@
 
 #include <EEPROM.h>
 //#include <IRremote.h>
+#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 #include <FastLED.h>
 
 #include <IRremoteESP8266.h>

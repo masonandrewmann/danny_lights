@@ -7,11 +7,12 @@
 
 //from wifi config code
 #include <EEPROM.h>
-#include "libraries/IotWebConf/src/IotWebConf.h"
+#include <IotWebConf.h>
 //from tmz artnet stuff
 #include <ArtnetWifi.h> // https://github.com/natcl/Artnet  
 #include <Adafruit_NeoPixel.h>
 
+#define FASTLED_ESP8266_RAW_PIN_ORDER
 #include <FastLED.h>
 
 #include <IRremoteESP8266.h>
@@ -47,7 +48,7 @@ int universeNum;
 int dmxAdr;
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
-const char thingName[] = "AutoconnectAP";
+const char thingName[] = "CyberBar3";
 
 // -- Initial password to connect to the Thing, when it creates an own Access Point.
 const char wifiInitialApPassword[] = "password";
@@ -75,10 +76,10 @@ uint32_t IRCommand;
 boolean haveWePickedColors;
 
 //LED setup
-#define DATA_PIN    15 //D8
+#define DATA_PIN    2 // D4 on ESP8266
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
-#define NUM_LEDS    60
+#define NUM_LEDS    32
 #define BRIGHTNESS          200   // GLOBAL brightness scale
 
 CRGB leds[NUM_LEDS];
@@ -363,7 +364,7 @@ String getPage(){
   s += "<br>";
   s += "<h3>Address</h3>";
   s += "<form action='submit' method='POST'>";
-  s += "<ul><li><input type='number' name='Adr' id = 'Adr' value ='" + String(dmxAdr) + "' min='0' max='24'>";
+  s += "<ul><li><input type='number' name='Adr' id = 'Adr' value ='" + String(dmxAdr) + "' min='0' max='512'>";
   s += "<br><br><br>";
   s += "<input type = 'submit' value='Submit'></li></ul>";
   s += "</body></html>\n";
