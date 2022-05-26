@@ -1386,7 +1386,7 @@
                   <expression>
                   </expression>
                   <actAsVariable>True</actAsVariable>
-                  <value>0</value>
+                  <value>58.6792452830189</value>
                   <inputMode>0</inputMode>
                   <data />
                 </activationFormula>
@@ -1593,9 +1593,10 @@
                     <formulas>
                       <formula>
                         <name>internalEmitter</name>
-                        <expression>0</expression>
+                        <expression>
+                        </expression>
                         <actAsVariable>True</actAsVariable>
-                        <value>18.4905660377358</value>
+                        <value>80.377358490566</value>
                         <inputMode>0</inputMode>
                         <data />
                       </formula>
@@ -1905,7 +1906,7 @@
                         <expression>
                         </expression>
                         <actAsVariable>True</actAsVariable>
-                        <value>38.1132075471698</value>
+                        <value>18.4905660377358</value>
                         <inputMode>0</inputMode>
                         <data />
                       </formula>
@@ -2091,7 +2092,7 @@
                         <expression>
                         </expression>
                         <actAsVariable>True</actAsVariable>
-                        <value>51.6981132075472</value>
+                        <value>56.2264150943396</value>
                         <inputMode>0</inputMode>
                         <data />
                       </formula>
@@ -3898,14 +3899,14 @@
                   <expression>
                   </expression>
                   <actAsVariable>True</actAsVariable>
-                  <value>20</value>
+                  <value>81.3207547169812</value>
                   <inputMode>0</inputMode>
                   <data />
                 </timeMultiplierFormula>
                 <emitters>
                   <emitter>
                     <direction>12</direction>
-                    <x>16</x>
+                    <x>41</x>
                     <y>13</y>
                     <color>0</color>
                     <formulas>
@@ -3938,12 +3939,12 @@
                       </formula>
                       <formula>
                         <name>positionX</name>
-                        <expression>sin(20)</expression>
+                        <expression>triangle(20)</expression>
                         <actAsVariable>False</actAsVariable>
-                        <value>16.4540715757771</value>
+                        <value>41.7414150943426</value>
                         <inputMode>9</inputMode>
                         <data>
-                          <function>sin({0})</function>
+                          <function>triangle({0})</function>
                           <speed>20</speed>
                           <phase>0</phase>
                         </data>

@@ -5,26 +5,23 @@
   https://github.com/dmonty2/ir_remote_leds
 */
 
+// south river wifi: RT-AC66U_B1_40_2G
+
 //from wifi config code
 #include <EEPROM.h>
 #include <IotWebConf.h>
-//from tmz artnet stuff
 #include <ArtnetWifi.h> // https://github.com/natcl/Artnet  
 #include <Adafruit_NeoPixel.h>
-
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 #include <FastLED.h>
-
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
 
 #define IR_TOLERANCE 8
-
 #define LEDPIN 16 //built in
 #define BUTTONPIN 13 // D7 on esp8266 dev boad
 #define MODEPIN 12 // D6 on esp8266 dev board
-
 
 ///EEPROM STRUCTURE
 //0 -- effect number
