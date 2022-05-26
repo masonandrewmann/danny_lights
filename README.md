@@ -1,7 +1,7 @@
 ![badge](https://img.shields.io/badge/ESP8266-HARDWARE-blue?style=flat-square)
 
-# wifi dmx + IR led lighting fixtures 
-using ESP8266 for individually addressable LED bars controllable through both IR remote and DMX network
+# the cyberbar - wifi artnet/dmx + IR led lighting fixtures 
+using ESP8266 for individually addressable LED bars controllable through both IR remote and wifi Artnet network
 
 ![example](img/example.gif)
 
