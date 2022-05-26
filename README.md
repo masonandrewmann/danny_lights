@@ -14,10 +14,12 @@ Hello and welcome to the *magical* light fixtures that can be controlled via a h
 Put switch in IR position and use your 44 key remote! Here is what it does:
 ![remote](img/remote_map.png)
 ### Wifi Artnet/DMX mode
-#### WIFI setup
+#### WIFI setup 
   - put switch in DMX position
   - It will initially be in "Access Point" mode. Connect to the device as you would connect to a new wifi router. It will be called 'Cyberbar' initially in your wifi setup. 
-  - Once you are connected to it, you should be taken to IP address 192.168.4.1 in your browswer. The screen should look like this: 
+    - username: CyberBar1 (or 2 or 3)
+    - password: password
+  - Once you are connected to it, you should be taken to IP address **192.168.4.1** in your browswer. The screen should look like this: 
 
    ![access](img/ap.jpg)
   - ArtNet typically starts at Universe 0! Check your console/lighting program for what universe you start at. 
@@ -42,6 +44,8 @@ IR code was modifed from [dmonty2's wonderful repo](https://github.com/dmonty2/i
 
 make sure you install ESP8266 board add-ons for the IDE, [here](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/) is instructions on how to do that 
 
+Only tested with ESP8266 using "NodMCU 1.0 (ESP-12E Module)" as the board. 
+
 ### required libraries: 
 IOT and WIFI stuff: 
  - [IOTWebConf.h](https://github.com/prampec/IotWebConf) // NOTE: This library has been modified so that it stores in EEPROM starting at address 8 instead of 0, use the version included in this repository rather than the official release OR change the line "# define IOTWEBCONF_CONFIG_START 0" to "# define IOTWEBCONF_CONFIG_START 8" in IotWebConf.h in the official release. **The updated file is in library/IotWebConf.h. Move this into your Arduino library folder!**
@@ -59,6 +63,8 @@ Misc Libraries to include:
 - EEPROM.h , should be inheirited from the ESP8266 board library 
 
 ### hardware notes
+Here are the interals: 
+![](img/bar_internal.jpg)
 Here is the schematic: 
 ![](img/schamatic.jpg)
 Included in the repo is a KiCad file for a PCB for the ESP8266:

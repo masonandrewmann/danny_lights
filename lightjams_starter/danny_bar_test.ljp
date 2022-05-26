@@ -1596,7 +1596,7 @@
                         <expression>
                         </expression>
                         <actAsVariable>True</actAsVariable>
-                        <value>80.377358490566</value>
+                        <value>51.6981132075472</value>
                         <inputMode>0</inputMode>
                         <data />
                       </formula>
@@ -1906,7 +1906,7 @@
                         <expression>
                         </expression>
                         <actAsVariable>True</actAsVariable>
-                        <value>18.4905660377358</value>
+                        <value>63.7735849056604</value>
                         <inputMode>0</inputMode>
                         <data />
                       </formula>
@@ -1915,7 +1915,7 @@
                         <expression>
                         </expression>
                         <actAsVariable>True</actAsVariable>
-                        <value>100</value>
+                        <value>80.377358490566</value>
                         <inputMode>0</inputMode>
                         <data />
                       </formula>
@@ -3906,7 +3906,7 @@
                 <emitters>
                   <emitter>
                     <direction>12</direction>
-                    <x>41</x>
+                    <x>95</x>
                     <y>13</y>
                     <color>0</color>
                     <formulas>
@@ -3941,7 +3941,7 @@
                         <name>positionX</name>
                         <expression>triangle(20)</expression>
                         <actAsVariable>False</actAsVariable>
-                        <value>41.7414150943426</value>
+                        <value>95.4439610046651</value>
                         <inputMode>9</inputMode>
                         <data>
                           <function>triangle({0})</function>
