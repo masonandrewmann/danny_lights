@@ -21,6 +21,7 @@ Hello and welcome to the *magical* light fixtures that can be controlled via a h
 - DMX mode - set as 3 channel fixtures with 32 pixels in each fixture
     - color mode = RGB
 - reset button: hold while turning on to reset the WIFI network to access point mode. 
+- ![reset](img/reset.jpg)
 
 ## installation guide:
 I am assuming you are using the classic Arduino IDE! 
