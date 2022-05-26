@@ -3,8 +3,11 @@
 # wifi dmx + IR led lighting fixtures 
 using ESP8266 for individually addressable LED bars controllable through both IR remote and DMX network
 
+![](img%5Cexample.gif)
+
 
 ## what is it?
+Control addresable led strips (ws2812 or similar) with a 44 key infrared remote or via Artnet over a wifi network. 
 
 ## how to use it? 
 
@@ -13,6 +16,8 @@ using ESP8266 for individually addressable LED bars controllable through both IR
 ## User Manual for the lights
 Hello and welcome to the *magical* light fixtures that can be controlled via a handy 44 key infrared remote OR from a lighting console, computer, or mobile device via DMX lighting protocol. 
 
+-IR mode
+![](img%5Cremote_map.png)
 - DMX mode - set as 3 channel fixtures with 32 pixels in each fixture
     - color mode = RGB
 - reset button: hold while turning on to reset the WIFI network to access point mode. 
